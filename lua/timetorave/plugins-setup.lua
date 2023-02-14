@@ -19,6 +19,10 @@ return require('packer').startup(function(use)
   use("nvim-lualine/lualine.nvim")
 
   -- Finding
+  -- Install ripgrep from choco 
+  -- choco install ripgrep
   use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" }) 
-  use({ "nvim-telescope/telescope.nvim", branch = "0.1.x" })
+  use({ "nvim-telescope/telescope.nvim", branch = "0.1.1" ,
+        requires = { {'nvim-lua/plenary.nvim'} }}
+  )
 end)
