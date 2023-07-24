@@ -25,6 +25,15 @@ return require('packer').startup(function(use)
   use({ "nvim-telescope/telescope.nvim", branch = "0.1.1" ,
         requires = { {'nvim-lua/plenary.nvim'} }}
   )
-  use {'nvim-telescope/telescope-ui-select.nvim' }
+  use { "nvim-telescope/telescope-ui-select.nvim" }
+
+  use {
+    "folke/which-key.nvim",
+    config = function()
+      vim.o.timeout = true
+      vim.o.timeoutlen = 300
+      require("which-key").setup { }
+    end
+  }
 
 end)
