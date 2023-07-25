@@ -36,4 +36,6 @@ return require('packer').startup(function(use)
     end
   }
 
+  use 'echasnovski/mini.indentscope'
+
 end)
