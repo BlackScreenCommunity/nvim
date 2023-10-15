@@ -38,4 +38,21 @@ return require('packer').startup(function(use)
 
   use 'echasnovski/mini.indentscope'
 
+  -- Obsidian plugin
+  use({
+  "epwalsh/obsidian.nvim",
+  requires = {
+    -- Required.
+    "nvim-lua/plenary.nvim",
+
+    -- see below for full list of optional dependencies 👇
+  },
+  config = function()
+    require("obsidian").setup({
+      dir = "~/Dropbox/KB",
+
+      -- see below for full list of options 👇
+    })
+  end,
+})
 end)
