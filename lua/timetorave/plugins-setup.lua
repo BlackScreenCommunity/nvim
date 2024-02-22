@@ -40,19 +40,20 @@ return require('packer').startup(function(use)
 
   -- Obsidian plugin
   use({
-  "epwalsh/obsidian.nvim",
-  requires = {
-    -- Required.
-    "nvim-lua/plenary.nvim",
+      "epwalsh/obsidian.nvim",
+      requires = {
+        "nvim-lua/plenary.nvim",
+      },
+      config = function()
+        require("obsidian").setup({
+          dir = "~/Dropbox/KB",
+        })
+      end,
+  })
 
-    -- see below for full list of optional dependencies 👇
-  },
-  config = function()
-    require("obsidian").setup({
-      dir = "~/Dropbox/KB",
-
-      -- see below for full list of options 👇
-    })
-  end,
-})
+  use {
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    "neovim/nvim-lspconfig"
+  }
 end)
