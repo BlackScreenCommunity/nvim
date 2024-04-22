@@ -9,3 +9,4 @@ require("timetorave.plugins.telescope")
 require("timetorave.plugins.obsidian")
 require("timetorave.plugins.mason")
 require('mini.indentscope').setup()
+require('multicursors').setup{}

@@ -21,8 +21,8 @@ return require('packer').startup(function(use)
   -- Finding
   -- Install ripgrep from choco 
   -- choco install ripgrep
-  use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" }) 
-  use({ "nvim-telescope/telescope.nvim", branch = "0.1.1" ,
+  use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" })
+  use({ "nvim-telescope/telescope.nvim", branch = "0.1.x",
         requires = { {'nvim-lua/plenary.nvim'} }}
   )
   use { "nvim-telescope/telescope-ui-select.nvim" }
@@ -56,4 +56,10 @@ return require('packer').startup(function(use)
     "williamboman/mason-lspconfig.nvim",
     "neovim/nvim-lspconfig"
   }
+
+  use {
+    "smoka7/hydra.nvim",
+    "smoka7/multicursors.nvim",
+  }
+
 end)

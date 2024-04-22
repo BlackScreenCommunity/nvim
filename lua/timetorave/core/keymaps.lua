@@ -37,3 +37,12 @@ wk.register({
     x = { ":close<CR>", "Close current split window. leader+sx" },
   },
 }, { prefix = "<leader>" })
+
+
+-- Регистрация хоткеев для работы с мультикурсорами
+wk.register({
+  e = {
+    name = "editor",
+    d = { ":MCstart<CR>", "Start multicursor mode. leader+ed" },
+  },
+}, { prefix = "<leader>" })
