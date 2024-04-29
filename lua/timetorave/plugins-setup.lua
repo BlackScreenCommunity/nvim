@@ -62,4 +62,8 @@ return require('packer').startup(function(use)
     "smoka7/multicursors.nvim",
   }
 
+  use {
+    "lewis6991/gitsigns.nvim"
+  }
+
 end)
