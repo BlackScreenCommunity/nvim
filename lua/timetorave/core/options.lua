@@ -24,3 +24,6 @@ vim.opt.clipboard:append("unnamedplus")
 -- Логика разделения на панели
 vim.opt.splitright = true
 vim.opt.splitbelow = true
+
+vim.cmd("set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz")
+
