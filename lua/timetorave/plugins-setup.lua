@@ -66,4 +66,10 @@ return require('packer').startup(function(use)
     "lewis6991/gitsigns.nvim"
   }
 
+  use {
+    "NeogitOrg/neogit",
+    "nvim-lua/plenary.nvim",
+    "sindrets/diffview.nvim"
+  }
+
 end)

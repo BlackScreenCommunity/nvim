@@ -9,5 +9,6 @@ require("timetorave.plugins.telescope")
 require("timetorave.plugins.obsidian")
 require("timetorave.plugins.mason")
 require("timetorave.plugins.gitsigns")
+require("timetorave.plugins.neogit")
 require('mini.indentscope').setup()
 require('multicursors').setup{}
