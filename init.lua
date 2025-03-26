@@ -59,17 +59,10 @@ vim.opt.splitbelow = true
 vim.cmd("set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz")
 
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>f", ":Files!<cr>")
-vim.keymap.set("n", "<leader>g", ":RG!<cr>")
+vim.keymap.set("n", "<leader>ff", ":Files!<cr>")
+vim.keymap.set("n", "<leader>fs", ":RG!<cr>")
 
 local lspconfig = require("lspconfig")
--- local lsps = { "gopls" }
--- for _, lsp in pairs(lsps) do
---    local setup = {}
---    lspconfig[lsp].setup(setup)
---end
---
-
 
 local on_attach = function(client, bufnr)
   -- Enable completion triggered by <c-x><c-o>
@@ -116,6 +109,34 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 --     format_after_save = {},
 -- })
 
+
+
+-- -- -- -- --
+--  C# LSP  --
+-- -- -- -- --
+
+lspconfig.omnisharp.setup({
+  cmd = {
+    'dotnet',
+    os.getenv('HOME') .. '/.local/share/omnisharp/OmniSharp.dll',
+    '--languageserver',
+    '--hostPID',
+    tostring(vim.fn.getpid())
+  },
+  enable_editorconfig_support = true,
+  enable_ms_build_load_projects_on_demand = false,
+  enable_roslyn_analyzers = true,
+  organize_imports_on_format = true,
+  filetypes = { 'cs', 'vb' },
+  root_dir = lspconfig.util.root_pattern("*.csproj", ".git"),
+  on_attach = function(client, bufnr)
+    local bufopts = { noremap=true, silent=true, buffer=bufnr }
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
+    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+  end,
+})
 
 -- Setup GIT plugins --
 local setup, gitsigns = pcall(require, "gitsigns")
