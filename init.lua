@@ -11,7 +11,8 @@ require("paq")({
 	"NeogitOrg/neogit",
     "nvim-lua/plenary.nvim",
     "sindrets/diffview.nvim",
-	"stevearc/oil.nvim"
+	"stevearc/oil.nvim",
+	"folke/which-key.nvim",
 })
 
 
@@ -167,3 +168,41 @@ local setup, oil = pcall(require, "oil")
 if setup then
   oil.setup() 
 end
+
+
+local setup, whichkey = pcall(require, "which-key")
+if not setup then
+  return
+end
+
+whichkey.setup()
+-- Регистрация хоткеев для работы с файлами 
+whichkey.register({
+   f = {
+     name = "files", -- optional group name
+     t = { "<cmd>NvimTreeToggle<CR>", "Toggle Folder Tree" },
+     f = { "<cmd>Telescope find_files<cr>", "Find File" }, -- create a binding with label
+     s = { "<cmd>Telescope live_grep<cr>", "Find string in current working directory" }, -- additional options for creating the keymap
+     c = { "<cmd>Telescope grep_string<cr>", "Find string under cursor in current working directory" },
+   },
+ }, { prefix = "<leader>" })
+
+-- Регистрация хоткеев для работы с буферами
+ whichkey.register({
+   b = {
+     name = "buffers",
+     r = { "<cmd>bdelete<CR>", "Kill Buffer" },
+     a = { "<leader>fb", "List open buffers in current neovim instance" },
+   },
+ }, { prefix = "<leader>" })
+
+ --Регистрация хоткеев для работы с окнами 
+ whichkey.register({
+   w = {
+     name = "windows",
+     v = { "<C-w>v", "Split window vertically. leader+sv" },
+     h = { "<C-w>s", "Split window horizontally. leader+sh" },
+     e = { "<C-w>=", "Split windows equal width. leader+se" },
+     x = { ":close<CR>", "Close current split window. leader+sx" },
+   },
+ }, { prefix = "<leader>" })
