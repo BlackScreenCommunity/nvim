@@ -166,7 +166,11 @@ neogit.setup()
 
 local setup, oil = pcall(require, "oil")
 if setup then
-  oil.setup() 
+  oil.setup({
+	view_options = {
+    	show_hidden = true,
+	}
+  }) 
 end
 
 
