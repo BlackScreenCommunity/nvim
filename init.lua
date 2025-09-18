@@ -1,3 +1,4 @@
+pcall(function() vim.loader.enable() end)
 
 require("paq")({
     "savq/paq-nvim",
@@ -13,9 +14,11 @@ require("paq")({
     "sindrets/diffview.nvim",
 	"stevearc/oil.nvim",
 	"folke/which-key.nvim",
+	"nvim-telescope/telescope.nvim",
+	"nvim-tree/nvim-tree.lua",
+	"nvim-tree/nvim-web-devicons",
+	"echasnovski/mini.icons", -- as dependency fro which-key plugin
 })
-
-
 
 -- Theme Settings --
 vim.g.nord_contrast = false 
@@ -27,13 +30,11 @@ vim.cmd("colorscheme nord")
 
 
 -- Setup Comments plugin --
--- import comment plugin safely
 local setup, comment = pcall(require, "Comment")
 if not setup then
   return
 end
 
--- enable comment
 comment.setup()
 
 
@@ -70,19 +71,6 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 end
 
-lspconfig.gopls.setup({
-  on_attach = on_attach,
-  settings = {
-    gopls = {
-      analyses = {
-        unusedparams = true,
-      },
-      staticcheck = true,
-      gofumpt = true,
-    },
-  },
-})
-
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*.go",
   callback = function()
@@ -105,31 +93,21 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.lsp.buf.format({async = false})
   end
 })
--- require("conform").setup({
---     formatters_by_ft = {},
---     format_after_save = {},
--- })
 
-
-
--- -- -- -- --
---  C# LSP  --
--- -- -- -- --
-
-lspconfig.omnisharp.setup({
-  cmd = {
-    'dotnet',
-    os.getenv('HOME') .. '/.local/share/omnisharp/OmniSharp.dll',
-    '--languageserver',
-    '--hostPID',
-    tostring(vim.fn.getpid())
+-- Go
+vim.lsp.config("gopls", {
+  on_attach = on_attach,
+  settings = {
+    gopls = {
+      analyses = { unusedparams = true },
+      staticcheck = true,
+      gofumpt = true,
+    },
   },
-  enable_editorconfig_support = true,
-  enable_ms_build_load_projects_on_demand = false,
-  enable_roslyn_analyzers = true,
-  organize_imports_on_format = true,
-  filetypes = { 'cs', 'vb' },
-  root_dir = lspconfig.util.root_pattern("*.csproj", ".git"),
+})
+
+-- C#
+vim.lsp.config("omnisharp", {
   on_attach = function(client, bufnr)
     local bufopts = { noremap=true, silent=true, buffer=bufnr }
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
