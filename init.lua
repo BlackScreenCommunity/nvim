@@ -109,11 +109,11 @@ vim.lsp.config("gopls", {
 -- C#
 vim.lsp.config("omnisharp", {
   on_attach = function(client, bufnr)
-    local bufopts = { noremap=true, silent=true, buffer=bufnr }
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, bufopts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, bufopts)
-    vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, bufopts)
+    local bufopts = { noremap = true, silent = true, buffer = bufnr }
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, bufopts)
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts)
   end,
 })
 
@@ -152,39 +152,86 @@ if setup then
 end
 
 
-local setup, whichkey = pcall(require, "which-key")
-if not setup then
-  return
+do
+  local ok, mini_icons = pcall(require, "mini.icons")
+  if ok then
+    mini_icons.setup()
+  end
 end
 
-whichkey.setup()
--- Регистрация хоткеев для работы с файлами 
-whichkey.register({
-   f = {
-     name = "files", -- optional group name
-     t = { "<cmd>NvimTreeToggle<CR>", "Toggle Folder Tree" },
-     f = { "<cmd>Telescope find_files<cr>", "Find File" }, -- create a binding with label
-     s = { "<cmd>Telescope live_grep<cr>", "Find string in current working directory" }, -- additional options for creating the keymap
-     c = { "<cmd>Telescope grep_string<cr>", "Find string under cursor in current working directory" },
-   },
- }, { prefix = "<leader>" })
+do
+  local ok, whichkey = pcall(require, "which-key")
+  if ok then
+	whichkey.setup({
+		icons = {
+			group = " ",   -- значок перед именем группы
+			mappings = true, -- включить иконки у пунктов (если есть)
+		},
+		win = {
+			border = "rounded",
+		},
+	})
 
--- Регистрация хоткеев для работы с буферами
- whichkey.register({
-   b = {
-     name = "buffers",
-     r = { "<cmd>bdelete<CR>", "Kill Buffer" },
-     a = { "<leader>fb", "List open buffers in current neovim instance" },
-   },
- }, { prefix = "<leader>" })
 
- --Регистрация хоткеев для работы с окнами 
- whichkey.register({
-   w = {
-     name = "windows",
-     v = { "<C-w>v", "Split window vertically. leader+sv" },
-     h = { "<C-w>s", "Split window horizontally. leader+sh" },
-     e = { "<C-w>=", "Split windows equal width. leader+se" },
-     x = { ":close<CR>", "Close current split window. leader+sx" },
-   },
- }, { prefix = "<leader>" })
+	whichkey.add({
+		-- ── Files ────────────────────────────────────────────────────────────────
+		{ "<leader>f",  group = " Files" },
+		{ "<leader>ff", "<cmd>Telescope find_files<CR>",     desc = " Find file" },
+		{ "<leader>fs", "<cmd>Telescope live_grep<CR>",      desc = " Live grep (rg)" },
+		{ "<leader>fc", "<cmd>Telescope grep_string<CR>",    desc = " Grep under cursor" },
+		{ "<leader>fb", "<cmd>Telescope buffers<CR>",        desc = "󰈙 Buffers" },
+		{ "<leader>ft", "<cmd>NvimTreeToggle<CR>",           desc = " Toggle folder tree" },
+		{ "<leader>fo", "<cmd>Oil<CR>",                      desc = " Oil (parent dir)" },
+
+		-- ── Buffers ─────────────────────────────────────────────────────────────
+		{ "<leader>b",  group = "󰈙 Buffers" },
+		{ "<leader>bn", "<cmd>bnext<CR>",                              desc = " Next buffer" },
+		{ "<leader>bp", "<cmd>bprevious<CR>",                          desc = " Prev buffer" },
+		{ "<leader>bd", "<cmd>bdelete<CR>",                            desc = " Close buffer" },
+		{ "<leader>bl", "<cmd>Telescope buffers<CR>",        desc = " List buffers" },
+
+		-- ── Windows / Splits ────────────────────────────────────────────────────
+		{ "<leader>w",  group = " Windows" },
+		{ "<leader>wv", "<C-w>v",                                      desc = " Vertical split" },
+		{ "<leader>wh", "<C-w>s",                                      desc = " Horizontal split" },
+		{ "<leader>we", "<C-w>=",                                      desc = "󰒓 Equalize" },
+		{ "<leader>wx", "<cmd>close<CR>",                              desc = " Close split" },
+
+		-- ── Git ─────────────────────────────────────────────────────────────────
+		{ "<leader>g",  group = " Git" },
+		{ "<leader>gs", "<cmd>Neogit kind=auto<CR>",         desc = " Neogit" },
+		{ "<leader>gd", "<cmd>Gitsigns diffthis<CR>",        desc = " Diff (current)" },
+		{ "<leader>gb", "<cmd>Gitsigns blame_line<CR>",      desc = " Blame line" },
+		{ "<leader>gv", "<cmd>DiffviewOpen<CR>",             desc = " Diffview open" },
+		{ "<leader>gV", "<cmd>DiffviewClose<CR>",            desc = " Diffview close" },
+
+		-- ── LSP / Code ──────────────────────────────────────────────────────────
+		{ "<leader>l",  group = " LSP" },
+		{ "<leader>ld", vim.lsp.buf.definition,                        desc = "󰈔 Go to definition" },
+		{ "<leader>lr", vim.lsp.buf.references,                        desc = " References" },
+		{ "<leader>lh", vim.lsp.buf.hover,                             desc = " Hover" },
+		{ "<leader>ln", vim.lsp.buf.rename,                            desc = " Rename" },
+		{ "<leader>la", vim.lsp.buf.code_action,                       desc = " Code action" },
+		{ "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, desc = " Format" },
+
+		-- ── Diagnostics ─────────────────────────────────────────────────────────
+		{ "<leader>d",  group = " Diagnostics" },
+		{ "<leader>dd", vim.diagnostic.open_float,                     desc = " Line diagnostics" },
+		{ "<leader>dn", vim.diagnostic.goto_next,                      desc = " Next diagnostic" },
+		{ "<leader>dp", vim.diagnostic.goto_prev,                      desc = " Prev diagnostic" },
+		{ "<leader>dl", "<cmd>Telescope diagnostics<CR>",    desc = "󱖫 All diagnostics" },
+
+		-- ── Toggles / Misc ──────────────────────────────────────────────────────
+		{ "<leader>t",  group = " Toggles" },
+		{ "<leader>tn", function() vim.opt.relativenumber = not vim.opt.relativenumber:get() end, desc = " Toggle relative number" },
+		{ "<leader>tw", function() vim.wo.wrap = not vim.wo.wrap end,                               desc = " Toggle wrap" },
+		{ "<leader>tc", function() vim.opt.cursorline = not vim.opt.cursorline:get() end,           desc = " Toggle cursorline" },
+
+		-- ── Session / Quit ──────────────────────────────────────────────────────
+		{ "<leader>q",  group = " Quit" },
+		{ "<leader>qq", "<cmd>qa!<CR>",                                desc = " Quit all!" },
+		{ "<leader>qw", "<cmd>wqa<CR>",                                desc = " Save & quit" },
+	  })
+
+  end
+end
