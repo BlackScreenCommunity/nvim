@@ -66,56 +66,26 @@ vim.keymap.set("n", "<leader>fs", ":RG!<cr>")
 
 local lspconfig = require("lspconfig")
 
-local on_attach = function(client, bufnr)
-  -- Enable completion triggered by <c-x><c-o>
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+-- Mason 
+local ok_mason, mason = pcall(require, "mason")
+if ok_mason then mason.setup() end
+
+local ok_mason_lsp, mason_lsp = pcall(require, "mason-lspconfig")
+if ok_mason_lsp then
+  mason_lsp.setup({
+    ensure_installed = {
+    },
+    automatic_installation = true,
+  })
 end
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.go",
-  callback = function()
-    local params = vim.lsp.util.make_range_params()
-    params.context = {only = {"source.organizeImports"}}
-    -- buf_request_sync defaults to a 1000ms timeout. Depending on your
-    -- machine and codebase, you may want longer. Add an additional
-    -- argument after params if you find that you have to write the file
-    -- twice for changes to be saved.
-    -- E.g., vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 3000)
-    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params)
-    for cid, res in pairs(result or {}) do
-      for _, r in pairs(res.result or {}) do
-        if r.edit then
-          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-          vim.lsp.util.apply_workspace_edit(r.edit, enc)
-        end
-      end
-    end
-    vim.lsp.buf.format({async = false})
-  end
-})
+-- Если пользуешься conform.nvim — удобно поставить форматтер C#
+-- через Mason (csharpier) тоже:
+pcall(function()
+  require("mason").setup() -- на случай если mason не инициализировался выше
+  require("mason-lspconfig").setup()
+end)
 
--- Go
-vim.lsp.config("gopls", {
-  on_attach = on_attach,
-  settings = {
-    gopls = {
-      analyses = { unusedparams = true },
-      staticcheck = true,
-      gofumpt = true,
-    },
-  },
-})
-
--- C#
-vim.lsp.config("omnisharp", {
-  on_attach = function(client, bufnr)
-    local bufopts = { noremap = true, silent = true, buffer = bufnr }
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
-    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, bufopts)
-    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, bufopts)
-  end,
-})
 
 -- Setup GIT plugins --
 local setup, gitsigns = pcall(require, "gitsigns")
