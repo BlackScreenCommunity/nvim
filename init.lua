@@ -18,6 +18,8 @@ require("paq")({
 	"nvim-tree/nvim-tree.lua",
 	"nvim-tree/nvim-web-devicons",
 	"echasnovski/mini.icons", -- as dependency fro which-key plugin
+	"williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim"
 })
 
 -- Theme Settings --
@@ -64,8 +66,6 @@ vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>ff", ":Files!<cr>")
 vim.keymap.set("n", "<leader>fs", ":RG!<cr>")
 
-local lspconfig = require("lspconfig")
-
 -- Mason 
 local ok_mason, mason = pcall(require, "mason")
 if ok_mason then mason.setup() end
@@ -74,6 +74,9 @@ local ok_mason_lsp, mason_lsp = pcall(require, "mason-lspconfig")
 if ok_mason_lsp then
   mason_lsp.setup({
     ensure_installed = {
+		"ts_ls",
+		"eslint",
+		"jsonls"
     },
     automatic_installation = true,
   })
@@ -85,6 +88,104 @@ pcall(function()
   require("mason").setup() -- на случай если mason не инициализировался выше
   require("mason-lspconfig").setup()
 end)
+
+
+pcall(function()
+  local registry = require("mason-registry")
+  if not registry.is_installed("prettierd") then
+    registry.get_package("prettierd"):install()
+  end
+end)
+
+
+local function lsp_on_attach(client, bufnr)
+  client.server_capabilities.documentFormattingProvider = false
+  client.server_capabilities.documentRangeFormattingProvider = false
+end
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+-- TypeScript / JavaScript LSP
+local function lsp_on_attach(client, bufnr)
+  client.server_capabilities.documentFormattingProvider = false
+  client.server_capabilities.documentRangeFormattingProvider = false
+end
+-- TypeScript / JavaScript
+vim.lsp.config("ts_ls", {
+  on_attach = lsp_on_attach,
+  -- capabilities = ... (добавишь, если подключишь nvim-cmp)
+})
+vim.lsp.enable("ts_ls")
+
+-- ESLint (линт и автофиксы)
+-- ESLint LSP (с указанием nodePath на глобальный npm root)
+vim.lsp.config("eslint", {
+  on_attach = function(client, bufnr)
+    -- твой on_attach...
+  end,
+  settings = {
+    eslint = {
+      nodePath = (function()
+        local out = vim.fn.systemlist("npm root -g")[1]
+        if out and #out > 0 then return out end
+        return "C:/Users/" .. (os.getenv("USERNAME") or "") .. "/AppData/Roaming/npm/node_modules"
+      end)(),
+      packageManager = "npm",
+      workingDirectories = { mode = "auto" }
+    }
+  }
+})
+vim.lsp.enable("eslint")
+
+
+
+-- JSON (валидация + схемы по умолчанию)
+vim.lsp.config("jsonls", {
+  on_attach = lsp_on_attach,
+  settings = { json = { validate = { enable = true } } },
+})
+vim.lsp.enable("jsonls")
+
+
+
+local ok_conform, conform = pcall(require, "conform")
+if ok_conform then
+  conform.setup({
+    formatters_by_ft = {
+      javascript = { "prettierd", "prettier" },
+      javascriptreact = { "prettierd", "prettier" },
+      typescript = { "prettierd", "prettier" },
+      typescriptreact = { "prettierd", "prettier" },
+      json = { "prettierd", "prettier" },
+      jsonc = { "prettierd", "prettier" },
+      -- при желании можешь добавить markdown/yaml/… тоже на prettier
+    },
+	formatters = {
+      prettierd = {
+        command = vim.fn.stdpath("data") .. "/mason/bin/prettierd",
+        prepend_args = { "--use-tabs", "--tab-width", "4" },
+      },
+      prettier = {
+        prepend_args = { "--use-tabs", "--tab-width", "4" },
+      },
+    },
+    format_on_save = function(bufnr)
+      local ft = vim.bo[bufnr].filetype
+      if ft == "javascript" or ft == "javascriptreact"
+         or ft == "typescript" or ft == "typescriptreact"
+         or ft == "json" or ft == "jsonc" then
+        return { lsp_fallback = true, timeout_ms = 3000 }
+      end
+    end,
+  })
+
+  local prettierd_bin = vim.fn.stdpath("data") .. "/mason/bin/prettierd"
+  if vim.fn.executable(prettierd_bin) == 1 then
+    conform.formatters = conform.formatters or {}
+    conform.formatters.prettierd = { command = prettierd_bin }
+  end
+end
+
 
 
 -- Setup GIT plugins --
