@@ -306,3 +306,39 @@ do
 
   end
 end
+
+if not vim.g._uuid_seeded then
+  math.randomseed(tonumber(tostring(os.time()):reverse():sub(1,9)) + (vim.uv or vim.loop).hrtime())
+  vim.g._uuid_seeded = true
+end
+
+local function uuid()
+  local random = math.random
+  local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+  return string.gsub(template, '[xy]', function(c)
+    local v = (c == 'x') and random(0, 0xF) or random(8, 0xB)
+    return string.format('%x', v)
+  end)
+end
+
+-- Вставка N UUID'ов под курсор
+local function insert_uuid()
+	local id = uuid()
+	local row = vim.api.nvim_win_get_cursor(0)[1]
+	vim.api.nvim_buf_set_lines(0, row, row, true, {id})
+end
+
+-- Скопировать один UUID в системный буфер
+local function yank_uuid()
+  local id = uuid()
+  vim.fn.setreg('+', id)
+  vim.notify('UUID copied: ' .. id, vim.log.levels.INFO, { title = 'UUID' })
+end
+
+-- Команды
+vim.api.nvim_create_user_command('UUID', function(opts)
+    insert_uuid()
+end, {})
+
+vim.keymap.set('n', '<leader>uu', insert_uuid, { desc = 'Insert UUID' })
+vim.keymap.set('n', '<leader>uy', yank_uuid,               { desc = 'Yank UUID to clipboard' })
