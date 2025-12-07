@@ -19,7 +19,9 @@ require("paq")({
 	"nvim-tree/nvim-web-devicons",
 	"echasnovski/mini.icons", -- as dependency fro which-key plugin
 	"williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim"
+    "williamboman/mason-lspconfig.nvim",
+	"waiting-for-dev/ergoterm.nvim",
+	"ahmedkhalf/project.nvim",
 })
 
 -- Theme Settings --
@@ -253,6 +255,7 @@ do
 		{ "<leader>fb", "<cmd>Telescope buffers<CR>",        desc = "󰈙 Buffers" },
 		{ "<leader>ft", "<cmd>NvimTreeToggle<CR>",           desc = " Toggle folder tree" },
 		{ "<leader>fo", "<cmd>Oil<CR>",                      desc = " Oil (parent dir)" },
+		{ "<leader>fp", "<cmd>Telescope projects<CR>",       desc = "Projects" },
 
 		-- ── Buffers ─────────────────────────────────────────────────────────────
 		{ "<leader>b",  group = "󰈙 Buffers" },
@@ -293,15 +296,21 @@ do
 		{ "<leader>dl", "<cmd>Telescope diagnostics<CR>",    desc = "󱖫 All diagnostics" },
 
 		-- ── Toggles / Misc ──────────────────────────────────────────────────────
-		{ "<leader>t",  group = " Toggles" },
-		{ "<leader>tn", function() vim.opt.relativenumber = not vim.opt.relativenumber:get() end, desc = " Toggle relative number" },
-		{ "<leader>tw", function() vim.wo.wrap = not vim.wo.wrap end,                               desc = " Toggle wrap" },
-		{ "<leader>tc", function() vim.opt.cursorline = not vim.opt.cursorline:get() end,           desc = " Toggle cursorline" },
+		{ "<leader>p",  group = " Toggles" },
+		{ "<leader>pn", function() vim.opt.relativenumber = not vim.opt.relativenumber:get() end, desc = " Toggle relative number" },
+		{ "<leader>pw", function() vim.wo.wrap = not vim.wo.wrap end,                               desc = " Toggle wrap" },
+		{ "<leader>pc", function() vim.opt.cursorline = not vim.opt.cursorline:get() end,           desc = " Toggle cursorline" },
 
 		-- ── Session / Quit ──────────────────────────────────────────────────────
 		{ "<leader>q",  group = " Quit" },
 		{ "<leader>qq", "<cmd>qa!<CR>",                                desc = " Quit all!" },
 		{ "<leader>qw", "<cmd>wqa<CR>",                                desc = " Save & quit" },
+
+
+		{ "<leader>t", group = " Terminal" },
+		{ "<leader>tt", ":TermNew layout=float cmd=pwsh <CR>", desc = "Create terminal" },
+		{ "<leader>to", ":TermSelect<CR>", desc = "Open terminal selector" },
+
 	  })
 
   end
@@ -342,3 +351,36 @@ end, {})
 
 vim.keymap.set('n', '<leader>uu', insert_uuid, { desc = 'Insert UUID' })
 vim.keymap.set('n', '<leader>uy', yank_uuid,               { desc = 'Yank UUID to clipboard' })
+
+
+-- Терминал
+local setup, ergoterm = pcall(require, "ergoterm")
+if setup then
+	ergoterm.setup({
+	  picker = {
+	    picker = "telescope",
+	  }
+	})
+end
+
+
+local setup, nvimtree = pcall(require, "nvim-tree")
+if setup then
+  nvimtree.setup({
+  sync_root_with_cwd = true,
+  respect_buf_cwd = true,
+  update_focused_file = {
+    enable = true,
+    update_root = true
+  },
+})
+end
+
+local setup, project = pcall(require, "project_nvim")
+if setup then
+    project.setup ({
+    })
+
+	require('telescope').load_extension('projects')
+end
+
