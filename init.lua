@@ -57,6 +57,12 @@ vim.opt.cursorline = true
 
 -- Использование системного буфера при копировании
 vim.opt.clipboard:append("unnamedplus")
+-- При нажатии на x - удаленный символ не помещается в буфер
+vim.keymap.set('n', 'x', '"_x')
+vim.keymap.set('n', 'X', '"_X')
+
+vim.keymap.set('i', '<S-Insert>', '<C-r>+')
+vim.keymap.set('n', '<S-Insert>', '"+p')
 
 -- Логика разделения на панели
 vim.opt.splitright = true
