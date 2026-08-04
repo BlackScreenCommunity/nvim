@@ -35,11 +35,9 @@ vim.cmd("colorscheme nord")
 
 -- Setup Comments plugin --
 local setup, comment = pcall(require, "Comment")
-if not setup then
-  return
+if setup then
+  comment.setup()
 end
-
-comment.setup()
 
 
 vim.opt.tabstop = 4
@@ -89,14 +87,6 @@ if ok_mason_lsp then
     automatic_installation = true,
   })
 end
-
--- Если пользуешься conform.nvim — удобно поставить форматтер C#
--- через Mason (csharpier) тоже:
-pcall(function()
-  require("mason").setup() -- на случай если mason не инициализировался выше
-  require("mason-lspconfig").setup()
-end)
-
 
 pcall(function()
   local registry = require("mason-registry")
@@ -198,27 +188,25 @@ end
 
 -- Setup GIT plugins --
 local setup, gitsigns = pcall(require, "gitsigns")
-if not setup then
-  return
+if setup then
+  gitsigns.setup {
+      current_line_blame = true,
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = 'eol',
+        delay = 500,
+        ignore_whitespace = false,
+        virt_text_priority = 100,
+      }
+  }
+else
+  vim.notify("gitsigns.nvim failed to load: " .. tostring(gitsigns), vim.log.levels.WARN)
 end
-
-gitsigns.setup {
-    current_line_blame = true,
-    current_line_blame_opts = {
-      virt_text = true,
-      virt_text_pos = 'eol',
-      delay = 500,
-      ignore_whitespace = false,
-      virt_text_priority = 100,
-    }
-}
 
 local setup, neogit = pcall(require, "neogit")
-if not setup then
-  return
+if setup then
+  neogit.setup()
 end
-
-neogit.setup()
 
 
 local setup, oil = pcall(require, "oil")
