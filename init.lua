@@ -2,7 +2,6 @@ pcall(function() vim.loader.enable() end)
 
 require("paq")({
     "savq/paq-nvim",
-    "neovim/nvim-lspconfig",
     "stevearc/conform.nvim",
 	"shaunsingh/nord.nvim",
 	"numToStr/Comment.nvim",
@@ -16,8 +15,6 @@ require("paq")({
 	"nvim-tree/nvim-tree.lua",
 	"nvim-tree/nvim-web-devicons",
 	"echasnovski/mini.icons", -- as dependency fro which-key plugin
-	"williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
 	"waiting-for-dev/ergoterm.nvim",
 	"ahmedkhalf/project.nvim",
 })
@@ -68,90 +65,19 @@ vim.cmd("set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEF
 
 vim.g.mapleader = " "
 
--- Mason
-local ok_mason, mason = pcall(require, "mason")
-if ok_mason then mason.setup() end
-
-local ok_mason_lsp, mason_lsp = pcall(require, "mason-lspconfig")
-if ok_mason_lsp then
-  mason_lsp.setup({
-    ensure_installed = {
-		"ts_ls",
-		"eslint",
-		"jsonls"
-    },
-    automatic_installation = true,
-  })
-end
-
-pcall(function()
-  local registry = require("mason-registry")
-  if not registry.is_installed("prettierd") then
-    registry.get_package("prettierd"):install()
-  end
-end)
-
-
-local function lsp_on_attach(client, bufnr)
-  client.server_capabilities.documentFormattingProvider = false
-  client.server_capabilities.documentRangeFormattingProvider = false
-end
-
--- TypeScript / JavaScript
-vim.lsp.config("ts_ls", {
-  on_attach = lsp_on_attach,
-  -- capabilities = ... (добавишь, если подключишь nvim-cmp)
-})
-vim.lsp.enable("ts_ls")
-
--- ESLint (линт и автофиксы)
--- ESLint LSP (с указанием nodePath на глобальный npm root)
-vim.lsp.config("eslint", {
-  on_attach = function(client, bufnr)
-    -- твой on_attach...
-  end,
-  settings = {
-    eslint = {
-      nodePath = (function()
-        local out = vim.fn.systemlist("npm root -g")[1]
-        if out and #out > 0 then return out end
-        return "C:/Users/" .. (os.getenv("USERNAME") or "") .. "/AppData/Roaming/npm/node_modules"
-      end)(),
-      packageManager = "npm",
-      workingDirectories = { mode = "auto" }
-    }
-  }
-})
-vim.lsp.enable("eslint")
-
-
-
--- JSON (валидация + схемы по умолчанию)
-vim.lsp.config("jsonls", {
-  on_attach = lsp_on_attach,
-  settings = { json = { validate = { enable = true } } },
-})
-vim.lsp.enable("jsonls")
-
-
-
 local ok_conform, conform = pcall(require, "conform")
 if ok_conform then
   conform.setup({
     formatters_by_ft = {
-      javascript = { "prettierd", "prettier" },
-      javascriptreact = { "prettierd", "prettier" },
-      typescript = { "prettierd", "prettier" },
-      typescriptreact = { "prettierd", "prettier" },
-      json = { "prettierd", "prettier" },
-      jsonc = { "prettierd", "prettier" },
+      javascript = { "prettier" },
+      javascriptreact = { "prettier" },
+      typescript = { "prettier" },
+      typescriptreact = { "prettier" },
+      json = { "prettier" },
+      jsonc = { "prettier" },
       -- при желании можешь добавить markdown/yaml/… тоже на prettier
     },
 	formatters = {
-      prettierd = {
-        command = vim.fn.stdpath("data") .. "/mason/bin/prettierd",
-        prepend_args = { "--use-tabs", "--tab-width", "4" },
-      },
       prettier = {
         prepend_args = { "--use-tabs", "--tab-width", "4" },
       },
@@ -161,7 +87,7 @@ if ok_conform then
       if ft == "javascript" or ft == "javascriptreact"
          or ft == "typescript" or ft == "typescriptreact"
          or ft == "json" or ft == "jsonc" then
-        return { lsp_fallback = true, timeout_ms = 3000 }
+        return { timeout_ms = 3000 }
       end
     end,
   })
@@ -255,22 +181,6 @@ do
 		{ "<leader>gb", "<cmd>Gitsigns blame_line<CR>",      desc = " Blame line" },
 		{ "<leader>gv", "<cmd>DiffviewOpen<CR>",             desc = " Diffview open" },
 		{ "<leader>gV", "<cmd>DiffviewClose<CR>",            desc = " Diffview close" },
-
-		-- ── LSP / Code ──────────────────────────────────────────────────────────
-		{ "<leader>l",  group = " LSP" },
-		{ "<leader>ld", vim.lsp.buf.definition,                        desc = "󰈔 Go to definition" },
-		{ "<leader>lr", vim.lsp.buf.references,                        desc = " References" },
-		{ "<leader>lh", vim.lsp.buf.hover,                             desc = " Hover" },
-		{ "<leader>ln", vim.lsp.buf.rename,                            desc = " Rename" },
-		{ "<leader>la", vim.lsp.buf.code_action,                       desc = " Code action" },
-		{ "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, desc = " Format" },
-
-		-- ── Diagnostics ─────────────────────────────────────────────────────────
-		{ "<leader>d",  group = " Diagnostics" },
-		{ "<leader>dd", vim.diagnostic.open_float,                     desc = " Line diagnostics" },
-		{ "<leader>dn", vim.diagnostic.goto_next,                      desc = " Next diagnostic" },
-		{ "<leader>dp", vim.diagnostic.goto_prev,                      desc = " Prev diagnostic" },
-		{ "<leader>dl", "<cmd>Telescope diagnostics<CR>",    desc = "󱖫 All diagnostics" },
 
 		-- ── Toggles / Misc ──────────────────────────────────────────────────────
 		{ "<leader>p",  group = " Toggles" },
