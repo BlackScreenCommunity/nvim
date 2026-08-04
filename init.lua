@@ -4,8 +4,6 @@ require("paq")({
     "savq/paq-nvim",
     "neovim/nvim-lspconfig",
     "stevearc/conform.nvim",
-    "junegunn/fzf",
-    "junegunn/fzf.vim",
 	"shaunsingh/nord.nvim",
 	"numToStr/Comment.nvim",
 	"lewis6991/gitsigns.nvim",
@@ -69,10 +67,8 @@ vim.opt.splitbelow = true
 vim.cmd("set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz")
 
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>ff", ":Files!<cr>")
-vim.keymap.set("n", "<leader>fs", ":RG!<cr>")
 
--- Mason 
+-- Mason
 local ok_mason, mason = pcall(require, "mason")
 if ok_mason then mason.setup() end
 
