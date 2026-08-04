@@ -101,13 +101,6 @@ local function lsp_on_attach(client, bufnr)
   client.server_capabilities.documentRangeFormattingProvider = false
 end
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-
--- TypeScript / JavaScript LSP
-local function lsp_on_attach(client, bufnr)
-  client.server_capabilities.documentFormattingProvider = false
-  client.server_capabilities.documentRangeFormattingProvider = false
-end
 -- TypeScript / JavaScript
 vim.lsp.config("ts_ls", {
   on_attach = lsp_on_attach,
@@ -176,12 +169,6 @@ if ok_conform then
       end
     end,
   })
-
-  local prettierd_bin = vim.fn.stdpath("data") .. "/mason/bin/prettierd"
-  if vim.fn.executable(prettierd_bin) == 1 then
-    conform.formatters = conform.formatters or {}
-    conform.formatters.prettierd = { command = prettierd_bin }
-  end
 end
 
 
